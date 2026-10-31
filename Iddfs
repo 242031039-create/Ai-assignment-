@@ -1,0 +1,64 @@
+import matplotlib.pyplot as plt
+import networkx as nx
+
+
+def dls_for_iddfs(node, goal, limit, graph, path, traversal):
+  path.append(node)
+  traversal.append(node)
+
+  if node == goal:
+    return True
+
+  if limit <= 0:
+    path.pop()
+    return False
+
+  for neighbor in graph.get(node, []):
+    if dls_for_iddfs(neighbor, goal, limit - 1, graph, path, traversal):
+      return True
+
+  path.pop()
+  return False
+
+
+def iddfs(graph, start, goal, max_depth):
+  overall_traversal = []
+  for depth in range(max_depth + 1):
+    path = []
+    traversal = []
+    found = dls_for_iddfs(start, goal, depth, graph, path, traversal)
+    overall_traversal.append((depth, traversal))
+    if found:
+      return path, overall_traversal
+  return None, overall_traversal
+
+
+# Graph Representation
+graph = {
+    'A': ['B', 'C'],
+    'B': ['D', 'E'],
+    'C': ['F'],
+    'D': [],
+    'E': ['F'],
+    'F': [],
+}
+
+start_node = 'A'
+goal_node = 'F'
+max_depth_limit = 3
+
+path, all_traversals = iddfs(graph, start_node, goal_node, max_depth_limit)
+for depth, trav in all_traversals:
+  print(f'Depth {depth} Traversal:', trav)
+
+print('Final Path to Goal:', path)
+
+# Visualization
+plt.figure(figsize=(6, 4))
+G = nx.DiGraph(graph)
+pos = nx.spring_layout(G)
+nx.draw(
+    G, pos, with_labels=True, node_color='violet', node_size=700, arrowsize=20
+)
+plt.title('IDDFS Graph Visualization')
+plt.show()
