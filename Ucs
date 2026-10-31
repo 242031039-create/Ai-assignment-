@@ -1,0 +1,68 @@
+import heapq
+import matplotlib.pyplot as plt
+import networkx as nx
+
+
+def uniform_cost_search(graph, start, goal):
+  # Priority queue stores (cost, current_node, path)
+  pq = [(0, start, [start])]
+  visited = {}
+
+  while pq:
+    cost, node, path = heapq.heappop(pq)
+
+    if node in visited and visited[node] <= cost:
+      continue
+
+    visited[node] = cost
+
+    if node == goal:
+      return path, cost
+
+    for neighbor, weight in graph.get(node, []):
+      new_cost = cost + weight
+      if neighbor not in visited or new_cost < visited.get(
+          neighbor, float('inf')
+      ):
+        heapq.heappush(pq, (new_cost, neighbor, path + [neighbor]))
+
+  return None, float('inf')
+
+
+# Weighted Graph Representation: {node: [(neighbor, cost), ...]}
+graph = {
+    'A': [('B', 1), ('C', 4)],
+    'B': [('D', 5), ('E', 2)],
+    'C': [('F', 1)],
+    'D': [],
+    'E': [('F', 3)],
+    'F': [],
+}
+
+start_node = 'A'
+goal_node = 'F'
+
+path, total_cost = uniform_cost_search(graph, start_node, goal_node)
+print('UCS Optimal Path:', path)
+print('Total Cost:', total_cost)
+
+# Visualization for Weighted Graph
+plt.figure(figsize=(6, 4))
+G = nx.DiGraph()
+for node, neighbors in graph.items():
+  for neighbor, weight in neighbors:
+    G.add_edge(node, neighbor, weight=weight)
+
+pos = nx.spring_layout(G)
+nx.draw(
+    G,
+    pos,
+    with_labels=True,
+    node_color='lightcoral',
+    node_size=700,
+    arrowsize=20,
+)
+edge_labels = nx.get_edge_attributes(G, 'weight')
+nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels)
+plt.title('UCS Weighted Graph Visualization')
+plt.show()
