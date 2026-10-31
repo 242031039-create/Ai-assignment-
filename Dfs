@@ -1,0 +1,60 @@
+import matplotlib.pyplot as plt
+import networkx as nx
+from collections import deque
+
+
+def bfs(graph, start, goal):
+  visited = set()
+  queue = deque([[start]])
+  traversal_path = []
+
+  while queue:
+    path = queue.popleft()
+    node = path[-1]
+
+    if node not in visited:
+      visited.add(node)
+      traversal_path.append(node)
+
+      if node == goal:
+        return path, traversal_path
+
+      for neighbor in graph.get(node, []):
+        if neighbor not in visited:
+          new_path = list(path)
+          new_path.append(neighbor)
+          queue.append(new_path)
+  return None, traversal_path
+
+
+# Graph Representation
+graph = {
+    'A': ['B', 'C'],
+    'B': ['D', 'E'],
+    'C': ['F'],
+    'D': [],
+    'E': ['F'],
+    'F': [],
+}
+
+start_node = 'A'
+goal_node = 'F'
+
+path, traversal = bfs(graph, start_node, goal_node)
+print('BFS Traversal Order:', traversal)
+print('Shortest Path to Goal:', path)
+
+# Visualization
+plt.figure(figsize=(6, 4))
+G = nx.DiGraph(graph)
+pos = nx.spring_layout(G)
+nx.draw(
+    G,
+    pos,
+    with_labels=True,
+    node_color='lightblue',
+    node_size=700,
+    arrowsize=20,
+)
+plt.title('BFS Graph Visualization')
+plt.show()
