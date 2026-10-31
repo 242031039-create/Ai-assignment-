@@ -1,0 +1,57 @@
+import matplotlib.pyplot as plt
+import networkx as nx
+
+
+def dls(graph, node, goal, limit, path=None, traversal=None):
+  if path is None:
+    path = []
+  if traversal is None:
+    traversal = []
+
+  path.append(node)
+  traversal.append(node)
+
+  if node == goal:
+    return path, traversal
+
+  if limit <= 0:
+    path.pop()
+    return None, traversal
+
+  for neighbor in graph.get(node, []):
+    res_path, res_traversal = dls(
+        graph, neighbor, goal, limit - 1, path.copy(), traversal
+    )
+    if res_path:
+      return res_path, res_traversal
+
+  return None, traversal
+
+
+# Graph Representation
+graph = {
+    'A': ['B', 'C'],
+    'B': ['D', 'E'],
+    'C': ['F'],
+    'D': [],
+    'E': ['F'],
+    'F': [],
+}
+
+start_node = 'A'
+goal_node = 'F'
+depth_limit = 2
+
+path, traversal = dls(graph, start_node, goal_node, depth_limit)
+print(f'DLS Traversal Order (Limit {depth_limit}):', traversal)
+print('Path to Goal:', path)
+
+# Visualization
+plt.figure(figsize=(6, 4))
+G = nx.DiGraph(graph)
+pos = nx.spring_layout(G)
+nx.draw(
+    G, pos, with_labels=True, node_color='orange', node_size=700, arrowsize=20
+)
+plt.title(f'DLS Graph Visualization (Limit = {depth_limit})')
+plt.show()
